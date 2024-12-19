@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conseguindo Associados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            overflow: hidden;
+        }
+        h1 {
+            margin-top: 20px;
+        }
+        #game-container {
+            margin-top: 50px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:disabled {
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+        }
+        #stats, #menu-comprar {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        #menu-comprar {
+            margin-top: 30px;
+            border-top: 2px solid #ccc;
+            padding-top: 20px;
+        }
+        #end-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            z-index: 1000;
+        }
+        #timer {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Conseguindo Associados</h1>
+    <div id="game-container">
+        <button id="click-button">Enviar Consultora para Associar Empresário</button>
+        <div id="stats">
+            <p>Associados: <span id="associates">0</span></p>
+            <p>Dinheiro: R$ <span id="money">0</span></p>
+            <p>Associados por Click: <span id="associates-per-click">1</span></p>
+        </div>
+        <div id="timer">
+            Boletos da Contribuição mensal a serem pagos em: <span id="countdown">10</span> segundos
+        </div>
+    </div>
+    <div id="menu-comprar">
+        <h2>Menu de Compras</h2>
+        <button id="buy-cafe">Realizar Café da Manhã de Negócios (R$ 8000) - +20 Associados</button>
+        <button id="buy-rodada">Realizar Rodada de Negócios (R$ 5000) - +10 Associados</button>
+        <button id="buy-desenvolve">Realizar Desenvolve ACSO (R$ 3000) - +5 Associados</button>
+        <button id="buy-trenzinho">Fazer Trenzinho da Alegria (R$ 130000) - ?????????</button>
+    </div>
+    <div id="end-screen">
+        Parabéns, a população está feliz e o comércio aquecido. A Associação é um sucesso!
+    </div>
+    <script>
+        // Variáveis principais
+        let associates = 0;
+        let money = 0;
+        let associatesPerClick = 1;
+        let moneyPerInterval = 30; // Dinheiro gerado por intervalo
+        const intervalTime = 10000; // 10 segundos
+        const clickCooldown = 5000; // 5 segundos de cooldown
+
+        // Referências aos elementos do DOM
+        const clickButton = document.getElementById('click-button');
+        const associatesDisplay = document.getElementById('associates');
+        const moneyDisplay = document.getElementById('money');
+        const associatesPerClickDisplay = document.getElementById('associates-per-click');
+        const countdownDisplay = document.getElementById('countdown');
+        const endScreen = document.getElementById('end-screen');
+
+        // Botões do menu de compras
+        const buyCafe = document.getElementById('buy-cafe');
+        const buyRodada = document.getElementById('buy-rodada');
+        const buyDesenvolve = document.getElementById('buy-desenvolve');
+        const buyTrenzinho = document.getElementById('buy-trenzinho');
+
+        // Controle de cooldown do botão
+        let canClick = true;
+
+        // Função para atualizar os displays
+        function updateDisplay() {
+            associatesDisplay.textContent = associates;
+            moneyDisplay.textContent = money;
+            associatesPerClickDisplay.textContent = associatesPerClick;
+
+            buyCafe.disabled = money < 8000;
+            buyRodada.disabled = money < 5000;
+            buyDesenvolve.disabled = money < 3000;
+            buyTrenzinho.disabled = money < 130000;
+        }
+
+        // Timer de contagem regressiva
+        let countdown = intervalTime / 1000;
+        setInterval(() => {
+            countdown -= 1;
+            if (countdown <= 0) {
+                money += associates * moneyPerInterval;
+                countdown = intervalTime / 1000;
+            }
+            countdownDisplay.textContent = countdown;
+            updateDisplay();
+        }, 1000);
+
+        // Evento do botão principal
+        clickButton.addEventListener('click', () => {
+            if (canClick) {
+                associates += associatesPerClick;
+                updateDisplay();
+                // Iniciar cooldown
+                canClick = false;
+                clickButton.disabled = true;
+                setTimeout(() => {
+                    canClick = true;
+                    clickButton.disabled = false;
+                }, clickCooldown);
+            }
+        });
+
+        // Eventos do menu de compras
+        buyCafe.addEventListener('click', () => {
+            if (money >= 8000) {
+                money -= 8000;
+                associates += 20;
+                updateDisplay();
+            }
+        });
+
+        buyRodada.addEventListener('click', () => {
+            if (money >= 5000) {
+                money -= 5000;
+                associates += 10;
+                updateDisplay();
+            }
+        });
+
+        buyDesenvolve.addEventListener('click', () => {
+            if (money >= 3000) {
+                money -= 3000;
+                associates += 5;
+                updateDisplay();
+            }
+        });
+
+        buyTrenzinho.addEventListener('click', () => {
+            if (money >= 130000) {
+                money -= 130000;
+                updateDisplay();
+                endScreen.style.display = 'flex';
+            }
+        });
+
+        // Inicializar o jogo
+        updateDisplay();
+    </script>
+</body>
+</html>
+
